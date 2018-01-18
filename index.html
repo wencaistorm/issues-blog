@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>issues-blog</title>
+</head>
+
+<body>
+  <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdn.bootcss.com/marked/0.3.9/marked.min.js"></script>
+  <script>
+    marked.setOptions({
+      renderer: new marked.Renderer(),
+      gfm: true,
+      tables: true,
+      breaks: false,
+      pedantic: false,
+      sanitize: false,
+      smartLists: true,
+      smartypants: false
+    });
+    var html = '';
+    $.ajax({
+      url: 'https://api.github.com/repos/yscoder/hexo-theme-indigo/issues',
+      type: 'get',
+      success: function (resp) {
+        console.log(resp)
+        resp.forEach(function (item) {
+          html += '<li><article class="post">\
+            <h1 class="post-title">'+ item.title + '</h1>\
+            <time class="post-date"></time>\
+            <div class="post-content">'+ marked(item.body) + '</div>\
+          </article></li>'
+        })
+        $('body').append(html);
+        hljs.initHighlightingOnLoad();
+      }
+    })
+  </script>
+</body>
+
+</html>
