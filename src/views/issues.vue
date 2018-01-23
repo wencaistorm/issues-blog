@@ -17,6 +17,10 @@
   font-size: 14px;
   color: #555;
 }
+.post-description h1,
+.post-description h2 {
+  font-size: 16px;
+}
 .label-name {
   color: #fff;
 }
@@ -45,7 +49,7 @@
             <Row v-for="item in list" type="flex" justify="center" class="code-row-bg article-item">
                 <Col span="20">
                     <article class="post">
-                        <a class="post-link" v-bind:href=item.number>{{ item.title }}</a>
+                        <router-link v-bind:to="'/issues/' + item.number" class="post-link" >{{ item.title }}</router-link>
                         <div class="post-mate">
                             <time>{{ item.created_at.slice(0, 10) }}</time>
                             <a class="post-label" href="javascript:;" v-for="label in item.labels" 
@@ -55,7 +59,7 @@
                         </div>
                         <p class="post-description">
                             <span class="text" v-html="item.body.substring(0, 150)"></span>
-                            <a class="post-link2" href="/posts/talk-about-premature-optimization/">[继续阅读...]</a>
+                            <router-link v-bind:to="'/issues/' + item.number" class="post-link2">[继续阅读...]</router-link>
                         </p>
                     </article>
                 </Col>
@@ -70,11 +74,16 @@ export default {
   data: function() {
     return {
       isLoading: true,
-      list: []
+      list: JSON.parse(window.localStorage.getItem("issues")) || []
     };
   },
   beforeMount: function() {
     var vm = this;
+    if (vm.list.length) {
+        vm.isLoading = false;
+        return;
+    }
+
     //   $.get("https://api.github.com/repos/phodal/articles/issues")
     $.get("https://api.github.com/repos/fouber/blog/issues")
       // $.get("https://api.github.com/repos/facebook/react/issues")
@@ -84,9 +93,9 @@ export default {
         });
         vm.list = resp.data;
         vm.isLoading = false;
+        window.localStorage.setItem("issues", JSON.stringify(resp.data));
       })
       .catch(err => {
-        console.log(err);
         vm.handleError();
       });
   },
